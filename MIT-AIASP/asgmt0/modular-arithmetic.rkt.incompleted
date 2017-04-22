@@ -1,0 +1,126 @@
+#lang racket
+;; Part 1
+; > (modulo 13 8)
+; 5
+; > (remainder 13 8)
+; 5
+; > (modulo -13 8)
+; 3
+; > (remainder -13 8)
+; -5
+; > (modulo -13 -8)
+; -5
+; > (remainder -13 -8)
+; -5
+;;Obviously modulo is suitable more modular arithmetic, since it keep the result within (0, n) / (n, 0) for postive / negative modulus respectively.
+
+(define (modular modulus op)
+  (lambda (a b)
+   (modulo (op a b) modulus)))
+; > ((modular 8 +) 7 5)
+; 4
+; > ((modular 17 +) 13 11)
+; 7
+; > ((modular 17 -) 13 11)
+; 2
+; > ((modular 17 *) 13 11)
+; 7
+
+(define (+mod a b n)
+  ((modular n +)
+   a
+   b))
+(define (-mod a b n)
+  ((modular n -)
+   a
+   b))
+(define (*mod a b n)
+  ((modular n *)
+   a
+   b))
+(define (/mod a b n)
+  ((modular n /)
+   a
+   b))
+; > (+mod 77 99 11)
+; 0
+; > (+mod 30 99 11)
+; 8
+; > (*mod 7 8 9)
+; 2
+;;---
+;;Part2
+;;The order of growth in time of slow-exptmod is O(n).
+;;Its order of growth in space is O(n).
+;;slow-exptmod use an recursive algorithm
+
+(define (exptmod p)
+  (let ((mod* (modular p *)))
+    (define (square x)
+      (mod* x x))
+    (define (em base exponent)
+      (cond
+        ((= exponent 0) 1)
+        ((even? exponent) (em (square base) (/ exponent 2)))
+        (else (mod* base (em base (- exponent 1))))))
+    em))
+; > ((exptmod 10) 2 0) ; -> 1
+; ((exptmod 10) 2 3) ; -> 8
+; ((exptmod 10) 3 4) ; -> 1
+; ((exptmod 100) 2 15) ; -> 68
+; ((exptmod 100) -5 3) ; -> 75
+; 1
+; 8
+; 1
+; 68
+; 75
+;;The order of growth in time of your implementation of exptmod is O(log(n)),
+;;its order of growth in space is O(log(n)).
+;;exptmod use an recursive algorithm.
+;;---
+;;Part3
+(define (random-k-digit-number k)
+  (if (= k 0)
+      0
+      (+
+       (* (random 10) (expt 10 (- k 1)))
+       (random-k-digit-number (- k 1)))))
+(define (count-digits n)
+  (if (= n 0)
+      0
+      (+ 1 (count-digits (quotient n 10)))))
+(define (big-random n)
+  (let ((r (random-k-digit-number (count-digits n))))
+    (if (< r n)
+        r
+        (big-random n))))
+; > (big-random 100) ; -> ?? (1-2 digit number)
+; (big-random 100) ; -> ?? (is it different?)
+; (big-random 1) ; -> 0
+; (big-random 1) ; -> 0 (should be always 0)
+; (big-random (expt 10 40)) ; -> ????... (roughly 40-digit number)
+; 94
+; 54
+; 0
+; 0
+; 6772988678443342844480675198106823192061
+;;---
+;;Part4
+;;The order of growth in time of slow-prime is O(n).
+;;The order of growth in space is O(n).
+;;slow-prime uses an iterative algorithm.
+;;
+;;only to check factors less than or equal to √n, order of growth in time is O(√n).
+;;only to check odd factors (and 2, as a special case) make no difference to it.
+;;Things related to Fermat’s Little Theorem have been covered in /exercises/chapter1/
+;;
+;;The order of growth in time prime? of this implementation is(or should be) O(log(n))
+;;O(1) * O(log(n)) = O(log(n))
+;;The order of growth in time prime? should be O(log(n)).
+;;Same as the above one.
+;;This implementation of prime? varys on the trivial implementation details.
+
+;;I think it is of no much meaning to answer the question. Partially cuz I needn't answer to anyone except myself.
+;;Besides, I have trouble using load with Racket which make me simply want to avoid it by combine all the code into one file.
+;;Due to this situation/reason, I am not very happey to make those comments full of the code file.
+;;Basically, I am expected, by myself, not to continue this while just put the codes in dh.scm. )r(
