@@ -1,4 +1,3 @@
-#lang racket
 (define (modular modulus op)
   (lambda (a b)
    (modulo (op a b) modulus)))

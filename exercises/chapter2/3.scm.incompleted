@@ -1,0 +1,6 @@
+#lang sicp
+(define (make-rectangle upper-left height width)
+  (cons upper-left (cons height width)))
+
+; A intermediate interface such as {left/upper/...}-side may be added between perimeter/area and rectangle abstraction "so that the same perimeter and area procedures will work using either representation".
+
