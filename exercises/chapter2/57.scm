@@ -17,7 +17,7 @@
 ; TO IMP: does not sum all numbers together into one term
 
 (define (make-product . m)
-  (define foo '(foo)) #| works unconditional if the implementation evaluates (eq? foo foo) to true while false for (eq? '(foo) '(foo)) |#
+  (define foo '(foo)) #| works unconditionally if the implementation evaluates (eq? foo foo) to true while false for (eq? '(foo) '(foo)) |#
   #| reference (for the above): http://stackoverflow.com/questions/16299246/what-is-the-difference-between-eq-eqv-equal-and-in-scheme |#
   (define (ccons x y)
     (if (eq? y foo)
