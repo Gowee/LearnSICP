@@ -68,7 +68,7 @@
           (else
            (error "unknown expression type -- DERIV" exp)))))
 
-(define hp-op '**) ; operator with highest precedence
+(define lp-op '+) ; operator with lowest precedence
 (define (precedenceof op)
   (case op
     ('HIGHEST 9)
@@ -76,17 +76,17 @@
     ('* 1)
     ('+ 0)
     (else -1)));(error "unknown operator -- " op))))
-(define (lowest-precedence expr last-hp-op i) ; search the operator with highest precedence in this expression (without nesting into sub-expressions) and return its index in the list
+(define (lowest-precedence expr last-hp-op i) ; search the operator with lowest precedence in this expression (without nesting into sub-expressions) and return its index in the list
   (if (null? (cdr expr)) ; not sub-expression (i.e. literal value or variable or parenthesized expression)
       i
       (let ((op (cadr expr)))
         (cond ((null? expr) i)
-              ((eq? op hp-op)
+              ((eq? op lp-op)
                (+ i 2))
               ((< (precedenceof op) (precedenceof last-hp-op)) (lowest-precedence (cddr expr) op (+ i 2)))
               (else (lowest-precedence (cddr expr) last-hp-op i))))))
 (define (formalize expr)
-  (define (f expr opi) ; formalize a expr according to the highest precedence whose index is opi
+  (define (f expr opi) ; formalize a expr according to the lowest precedence operator whose index is opi
     (let-values (((left _right) (split-at expr (- opi 1))))
       (let ((op (car _right)) (right (cdr _right)))
         (values (ft left) op (ft right)))))
@@ -123,5 +123,5 @@
 ; (deriv  '(x + 3 * (x + y + 2)) 'y)
 ; 3
 
-; Rationale: find the lowest operator in the expression and split the expression into two subexpressin, recursively
+; Rationale: find the lowest precedence operator in the expression and split the expression into two subexpressin, recursively
 ; Notes: to conform with the requirements in the text, `formailize` can be called in every constructor / selector of corresponding oprator instead of in deriv, but it is inefficient and I <del>cannot</del> have troubles in comeing up with other efficient algos that conforms with the text at lesat so far.
